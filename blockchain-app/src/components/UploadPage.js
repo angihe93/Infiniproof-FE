@@ -107,7 +107,7 @@ const UploadPage = () => {
       setRetrieveTimestamp(new Date(result.timestamp * 1000).toLocaleString());
       setRetrieveIndex(result.index);
 
-      // Fetch IPFS hash from local storage (mock example)
+
       const ipfsMockHash = "mocked-ipfs-hash"; // Replace with actual logic
       setIpfsGatewayLink(`https://gateway.pinata.cloud/ipfs/${ipfsMockHash}`);
     } catch (error) {

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate from React Router
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // Import Font Awesome for icons
@@ -10,6 +11,8 @@ const LandingPage = () => {
   const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
   const [message, setMessage] = useState(""); // To display success or error messages
   const [messageType, setMessageType] = useState(""); // "success" or "error"
+
+  const navigate = useNavigate(); // Initialize useNavigate for page navigation
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
@@ -116,7 +119,7 @@ const LandingPage = () => {
           <button
             type="button"
             className="btn btn-link p-0"
-            onClick={() => alert("Redirect to login page")}
+            onClick={() => navigate("/login")} // Navigate to login page
           >
             Log In
           </button>
@@ -127,6 +130,7 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+
 
 
 

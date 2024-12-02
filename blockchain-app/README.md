@@ -8,9 +8,9 @@ In the project directory, you can run:
 
 
 ### `npm install axios react-router-dom`
-
 ###  `npm install bootstrap`
 ###  `npm install @fortawesome/fontawesome-free`
+###  `npm install react-dropzone`
 
 ### `npm start`
 Runs the app in the development mode.\

@@ -6,6 +6,7 @@ import LoginPage from "./components/LoginPage";
 import LandingPage from "./components/LandingPage";
 import AccountOverview from "./components/AccountOverview";
 import UploadPage from "./components/UploadPage";
+import VerificationPage from "./components/VerificationPage";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -47,6 +48,7 @@ const App = () => {
         />
         {/* Upload Page: Now accessible unconditionally */}
         <Route path="/upload" element={<UploadPage />} />
+        <Route path="/verification" element={<VerificationPage />} />
       </Routes>
     </Router>
   );

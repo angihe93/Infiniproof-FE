@@ -1,17 +1,14 @@
-
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import API_BASE_URL from "../config";
 
 const VerificationPage = () => {
   const [transactionHash, setTransactionHash] = useState("");
   const [fileHash, setFileHash] = useState("");
   const [timestamp, setTimestamp] = useState("");
-  const [index, setIndex] = useState("");
   const [ipfsGatewayLink, setIpfsGatewayLink] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
-  const API_BASE_URL = "http://127.0.0.1:8000";
 
   const handleRetrieve = async () => {
     if (!transactionHash) {
@@ -21,16 +18,19 @@ const VerificationPage = () => {
 
     setErrorMessage("");
     try {
-      const response = await fetch(`${API_BASE_URL}/verify-hash/?tx_hash=${transactionHash}`);
+      // Fetch data from the API endpoint
+      const response = await fetch(`${API_BASE_URL}/verify/${transactionHash}`);
 
-      const result = await response.json();
       if (!response.ok) {
-        throw new Error(result.detail || "Failed to retrieve data");
+        const errorResult = await response.json();
+        throw new Error(errorResult.detail || "Failed to retrieve data");
       }
 
+      const result = await response.json();
+
+      // Update the state with retrieved data
       setFileHash(result.file_hash);
       setTimestamp(new Date(result.timestamp * 1000).toLocaleString());
-      setIndex(result.index);
       setIpfsGatewayLink(result.ipfs_url);
     } catch (error) {
       setErrorMessage(`Error: ${error.message}`);
@@ -67,7 +67,6 @@ const VerificationPage = () => {
             </p>
           )}
           {timestamp && <p><strong>Timestamp:</strong> {timestamp}</p>}
-          {index && <p><strong>Index:</strong> {index}</p>}
           {ipfsGatewayLink && (
             <p>
               <strong>IPFS Gateway Link:</strong>{" "}

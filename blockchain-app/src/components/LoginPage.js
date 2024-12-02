@@ -1,5 +1,8 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import API_BASE_URL from "../config";
 
 const LoginPage = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState("");
@@ -8,37 +11,38 @@ const LoginPage = ({ setIsLoggedIn }) => {
   const [messageType, setMessageType] = useState(""); // "success" or "error"
   const navigate = useNavigate();
 
-  // Mock user details
-  const mockUser = {
-    email: "testuser@example.com",
-    password: "123",
-  };
-
-  const handleLogin = () => {
-    if (email === mockUser.email && password === mockUser.password) {
-      // Simulate successful login
-      localStorage.setItem("isLoggedIn", "true");
+  const handleLogin = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/transactions/${email}`, {
+        params: { username: email, password },
+      });
+  
+      sessionStorage.setItem("email", email);
+      sessionStorage.setItem("password", password);
+  
       setIsLoggedIn(true);
       setMessage("Login successful! Redirecting...");
       setMessageType("success");
-
-      // Redirect to account overview after 2 seconds
       setTimeout(() => {
-        navigate("/account-overview");
+        navigate("/");
       }, 2000);
-    } else {
-      // Simulate login failure
-      setMessage("Invalid email or password. Please try again.");
+    } catch (error) {
+      const errorMsg = error.response?.data?.detail || "Login failed. Please try again.";
+      setMessage(typeof errorMsg === "string" ? errorMsg : JSON.stringify(errorMsg));
       setMessageType("error");
     }
   };
+  
+  
+  
+  
 
   return (
     <div className="container mt-5">
       <div className="card shadow p-4" style={{ maxWidth: "500px", margin: "0 auto" }}>
         <h3 className="text-center mb-4">Log In</h3>
 
-        {/* Displaying success or error messages */}
+        {/* Display success or error messages */}
         {message && (
           <div className={`alert ${messageType === "error" ? "alert-danger" : "alert-success"}`}>
             {message}
@@ -97,4 +101,3 @@ const LoginPage = ({ setIsLoggedIn }) => {
 };
 
 export default LoginPage;
-

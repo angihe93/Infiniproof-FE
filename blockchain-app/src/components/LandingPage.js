@@ -1,46 +1,57 @@
+
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate from React Router
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "@fortawesome/fontawesome-free/css/all.min.css"; // Import Font Awesome for icons
+import API_BASE_URL from "../config";
 
 const LandingPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
-  const [message, setMessage] = useState(""); // To display success or error messages
+  const [showPassword, setShowPassword] = useState(false);
+  const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState(""); // "success" or "error"
 
-  const navigate = useNavigate(); // Initialize useNavigate for page navigation
+  const navigate = useNavigate();
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       setMessage("Passwords do not match. Please try again!");
-      setMessageType("error"); // Set message type to "error"
+      setMessageType("error");
       return;
     }
+  
     try {
-      await axios.post("http://127.0.0.1:8000/api/register", {
-        email,
-        password,
+      // Use query parameters instead of the request body
+      const response = await axios.post(`${API_BASE_URL}/register`, null, {
+        params: {
+          username: email,
+          password: password,
+        },
       });
-      setMessage("Registration successful! Please log in.");
-      setMessageType("success"); // Set message type to "success"
+  
+      setMessage("Registration successful! Redirecting to login page...");
+      setMessageType("success");
+  
+      // Redirect to the login page after successful registration
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (error) {
-      setMessage(
-        error.response?.data?.detail || "Registration failed. Please check your input."
-      );
-      setMessageType("error"); // Set message type to "error"
+      const errorMsg =
+        error.response?.data?.detail || "Registration failed. Please try again.";
+      setMessage(typeof errorMsg === "string" ? errorMsg : JSON.stringify(errorMsg));
+      setMessageType("error");
     }
   };
+  
 
   return (
     <div className="container mt-5">
       <div className="card shadow p-4" style={{ maxWidth: "500px", margin: "0 auto" }}>
         <h3 className="text-center mb-4">Create Account</h3>
 
-        {/* Displaying message inside a red or blue alert box based on the message type */}
+        {/* Display success or error messages */}
         {message && (
           <div className={`alert ${messageType === "error" ? "alert-danger" : "alert-success"}`}>
             {message}
@@ -119,7 +130,7 @@ const LandingPage = () => {
           <button
             type="button"
             className="btn btn-link p-0"
-            onClick={() => navigate("/login")} // Navigate to login page
+            onClick={() => navigate("/login")}
           >
             Log In
           </button>
@@ -130,8 +141,3 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
-
-
-
-
-

@@ -1,34 +1,31 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "@fortawesome/fontawesome-free/css/all.min.css"; // Import Font Awesome for icons
 
-const LoginPage = () => {
+const LoginPage = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
-  const [message, setMessage] = useState(""); // To display success or error messages
-  const [messageType, setMessageType] = useState(""); // "success" or "error"
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState(""); // success or error
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
-      await axios.post("http://127.0.0.1:8000/api/login", {
+      const response = await axios.post("http://127.0.0.1:8000/api/login", {
         email,
         password,
       });
 
-      setMessage("Login successful! Redirecting...");
-      setMessageType("success");
-      // Redirect to dashboard or another page
-      // Example: window.location.href = "/dashboard";
-    } catch (error) {
-      if (error.response?.status === 404) {
-        setMessage("Account does not exist.");
-      } else if (error.response?.status === 401) {
-        setMessage("Incorrect password. Please try again.");
-      } else {
-        setMessage("An unexpected error occurred. Please try again later.");
+      // If login is successful
+      if (response.status === 200) {
+        localStorage.setItem("isLoggedIn", "true");
+        setIsLoggedIn(true);
+        navigate("/account-overview");
       }
+    } catch (error) {
+      setMessage(
+        error.response?.data?.detail || "Login failed. Please try again."
+      );
       setMessageType("error");
     }
   };
@@ -38,16 +35,14 @@ const LoginPage = () => {
       <div className="card shadow p-4" style={{ maxWidth: "500px", margin: "0 auto" }}>
         <h3 className="text-center mb-4">Log In</h3>
 
-        {/* Displaying message inside a red or green alert box */}
         {message && (
           <div className={`alert ${messageType === "error" ? "alert-danger" : "alert-success"}`}>
             {message}
           </div>
         )}
 
-        {/* Email input */}
         <div className="form-group mb-3">
-          <label htmlFor="email">Email Address</label>
+          <label htmlFor="email">Email</label>
           <input
             type="email"
             id="email"
@@ -58,29 +53,18 @@ const LoginPage = () => {
           />
         </div>
 
-        {/* Password input */}
         <div className="form-group mb-3">
           <label htmlFor="password">Password</label>
-          <div className="input-group">
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              className="form-control"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button
-              type="button"
-              className="btn btn-outline-secondary"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              <i className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"}`}></i>
-            </button>
-          </div>
+          <input
+            type="password"
+            id="password"
+            className="form-control"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </div>
 
-        {/* Login button */}
         <button
           type="button"
           className="btn btn-primary w-100"
@@ -88,23 +72,9 @@ const LoginPage = () => {
         >
           Log In
         </button>
-
-        {/* Switch to register */}
-        <div className="text-center mt-3">
-          <span>Don't have an account?</span>{" "}
-          <button
-            type="button"
-            className="btn btn-link p-0"
-            onClick={() => (window.location.href = "/register")}
-          >
-            Register
-          </button>
-        </div>
       </div>
     </div>
   );
 };
 
 export default LoginPage;
-
-

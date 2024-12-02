@@ -93,7 +93,7 @@ const UploadPage = () => {
       const result = response.data;
 
       setTransactionHash(result.tx_hash);
-      setTimestamp(new Date(result.timestamp * 1000).toLocaleString());
+      setTimestamp(result.timestamp);
       setEtherscanLink(result.etherscan_url);
       setIpfsHash(result.ipfs_hash);
       setStatusMessage("Upload successful!");

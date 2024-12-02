@@ -38,7 +38,6 @@ const AccountOverview = () => {
       <table className="table table-striped table-hover shadow-lg mt-4">
         <thead className="table-dark">
           <tr>
-            <th>Transaction Time</th>
             <th>Hash Value</th>
             <th>Blockchain Link</th>
             <th>File Link</th>
@@ -49,7 +48,6 @@ const AccountOverview = () => {
           {transactions.length ? (
             transactions.map((tx, index) => (
               <tr key={index}>
-                <td>{new Date(tx.timestamp).toLocaleString()}</td>
                 <td>{tx.file_hash}</td>
                 <td>
                   <a

@@ -1,31 +1,34 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
 const LoginPage = ({ setIsLoggedIn }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState(""); // success or error
+  const [messageType, setMessageType] = useState(""); // "success" or "error"
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post("http://127.0.0.1:8000/api/login", {
-        email,
-        password,
-      });
+  // Mock user details
+  const mockUser = {
+    email: "testuser@example.com",
+    password: "123",
+  };
 
-      // If login is successful
-      if (response.status === 200) {
-        localStorage.setItem("isLoggedIn", "true");
-        setIsLoggedIn(true);
+  const handleLogin = () => {
+    if (email === mockUser.email && password === mockUser.password) {
+      // Simulate successful login
+      localStorage.setItem("isLoggedIn", "true");
+      setIsLoggedIn(true);
+      setMessage("Login successful! Redirecting...");
+      setMessageType("success");
+
+      // Redirect to account overview after 2 seconds
+      setTimeout(() => {
         navigate("/account-overview");
-      }
-    } catch (error) {
-      setMessage(
-        error.response?.data?.detail || "Login failed. Please try again."
-      );
+      }, 2000);
+    } else {
+      // Simulate login failure
+      setMessage("Invalid email or password. Please try again.");
       setMessageType("error");
     }
   };
@@ -35,12 +38,14 @@ const LoginPage = ({ setIsLoggedIn }) => {
       <div className="card shadow p-4" style={{ maxWidth: "500px", margin: "0 auto" }}>
         <h3 className="text-center mb-4">Log In</h3>
 
+        {/* Displaying success or error messages */}
         {message && (
           <div className={`alert ${messageType === "error" ? "alert-danger" : "alert-success"}`}>
             {message}
           </div>
         )}
 
+        {/* Email input */}
         <div className="form-group mb-3">
           <label htmlFor="email">Email</label>
           <input
@@ -53,6 +58,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
           />
         </div>
 
+        {/* Password input */}
         <div className="form-group mb-3">
           <label htmlFor="password">Password</label>
           <input
@@ -65,6 +71,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
           />
         </div>
 
+        {/* Login button */}
         <button
           type="button"
           className="btn btn-primary w-100"
@@ -72,9 +79,22 @@ const LoginPage = ({ setIsLoggedIn }) => {
         >
           Log In
         </button>
+
+        {/* Switch to Register */}
+        <div className="text-center mt-3">
+          <span>Don't have an account?</span>{" "}
+          <button
+            type="button"
+            className="btn btn-link p-0"
+            onClick={() => navigate("/register")}
+          >
+            Register
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
 export default LoginPage;
+

@@ -20,13 +20,21 @@ const AccountOverview = () => {
         const response = await axios.get(`${API_BASE_URL}/transactions/${email}`, {
           params: { password },
         });
-        setTransactions(response.data);
+
+        const transactionData = response.data.map((tx) => ({
+          ...tx,
+          timestamp: tx.timestamp, // Set default value as "N/A" if timestamp is missing
+        }));
+
+        console.log("Fetched Transactions:", transactionData);
+        setTransactions(transactionData);
       } catch (error) {
         setMessage(
           error.response?.data?.detail || "Failed to fetch transaction records. Please try again."
         );
       }
     };
+
     fetchTransactions();
   }, []);
 
@@ -38,20 +46,23 @@ const AccountOverview = () => {
       <table className="table table-striped table-hover shadow-lg mt-4">
         <thead className="table-dark">
           <tr>
-            <th>Encrypted File Hash Value</th>
+            <th>Filename</th>
+            <th>Encrypted File Hash</th>
             <th>Blockchain Link</th>
             <th>File Link</th>
             <th>Key (First 5...Last 5)</th>
+            <th>Timestamp</th>
           </tr>
         </thead>
         <tbody>
           {transactions.length ? (
             transactions.map((tx, index) => (
               <tr key={index}>
-                <td>{tx.file_hash}</td>
+                <td>{tx.file_name}</td> {/* Filename */}
+                <td>{tx.file_hash}</td> {/* Encrypted file hash */}
                 <td>
                   <a
-                    href={tx.bc_hash_link}
+                    href={tx.etherscan_url}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-sm btn-outline-primary"
@@ -61,7 +72,7 @@ const AccountOverview = () => {
                 </td>
                 <td>
                   <a
-                    href={tx.bc_file_link}
+                    href={tx.ipfs_link}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-sm btn-outline-success"
@@ -69,14 +80,13 @@ const AccountOverview = () => {
                     Download
                   </a>
                 </td>
-                <td>
-                  {tx.decrypt_key_first_last_5}
-                </td>
+                <td>{tx.decrypt_key_first_last_5}</td> {/* Key */}
+                <td>{tx.timestamp}</td> {/* Display raw timestamp */}
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="text-center text-muted">
+              <td colSpan="6" className="text-center text-muted">
                 No transaction records available.
               </td>
             </tr>

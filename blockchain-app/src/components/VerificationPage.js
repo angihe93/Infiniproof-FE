@@ -8,6 +8,7 @@ const VerificationPage = () => {
   const [fileHash, setFileHash] = useState("");
   const [timestamp, setTimestamp] = useState("");
   const [ipfsGatewayLink, setIpfsGatewayLink] = useState("");
+  const [transactionLink, setTransactionLink] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleRetrieve = async () => {
@@ -33,6 +34,7 @@ const VerificationPage = () => {
       // setTimestamp(new Date(result.timestamp * 1000).toLocaleString());
       setTimestamp(result.timestamp) //timestamp is already string
       setIpfsGatewayLink(result.bc_file_link);
+      setTransactionLink("https://sepolia.etherscan.io/tx/0x"+transactionHash)
     } catch (error) {
       setErrorMessage(`Error: ${error.message}`);
     }
@@ -41,7 +43,7 @@ const VerificationPage = () => {
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
   };
-
+  
   return (
     <div className="container py-4">
       <div className="card p-4">
@@ -60,7 +62,7 @@ const VerificationPage = () => {
         {errorMessage && <p className="text-danger mt-3">{errorMessage}</p>}
         <div className="mt-4">
         {fileHash && <p><em>Successfully retrieved encrypted file from IPFS</em></p>}
-        {fileHash && <p><em>Hash of file from IPFS matches hash stored at {transactionHash}</em></p>}
+        {fileHash && <p><em>Hash of file from IPFS matches hash stored at </em><a href={transactionLink} target="_blank" rel="noopener noreferrer">{transactionHash}</a></p>}
         {fileHash && <p><strong color="green"><font color="green">Verification successful!</font></strong></p>}
           {fileHash && (
             <p>

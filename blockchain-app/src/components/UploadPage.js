@@ -8,6 +8,7 @@ import API_BASE_URL from "../config";
 const UploadPage = () => {
   const [file, setFile] = useState(null);
   const [transactionHash, setTransactionHash] = useState("");
+  const [hexString, setHexString] = useState("");
   const [timestamp, setTimestamp] = useState("");
   const [etherscanLink, setEtherscanLink] = useState("");
   const [ipfsHash, setIpfsHash] = useState("");
@@ -66,25 +67,29 @@ const UploadPage = () => {
     try {
       const key = await generateKey();
       const { nonce, encryptedFile } = await encryptFile(file, key);
-      const file_name = file.name;
+      const filename = file.name;
 
       const encryptedData = new Uint8Array([...nonce, ...encryptedFile]);
       const fileHash = await createHash(encryptedData);
 
-      const decryptKeyFirstLast = `${Array.from(key)
-        .slice(0, 5)
-        .map((b) => b.toString(16))
-        .join("")}...${Array.from(key)
-        .slice(-5)
-        .map((b) => b.toString(16))
-        .join("")}`;
+      // const decryptKeyFirstLast = `${Array.from(key)
+      //   .slice(0, 5)
+      //   .map((b) => b.toString(16))
+      //   .join("")}...${Array.from(key)
+      //   .slice(-5)
+      //   .map((b) => b.toString(16))
+      //   .join("")}`;
+        
+      const hexString = Array.from(key).map((b) => b.toString(16).padStart(2, '0')).join(""); //full encryption key. Display to user
+
+      const decryptKeyFirstLast = `${hexString.slice(0, 5)}...${hexString.slice(-5)}`; //truncated encryption key. Send to backend. DO NOT STORE FULL ENCRYPTION KEY
 
       const formData = new FormData();
       formData.append("encrypted_file", new Blob([encryptedData]));
 
       const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
         params: {
-          file_name,
+          filename,
           email,
           password,
           decrypt_key_first_last_5: decryptKeyFirstLast,
@@ -95,6 +100,7 @@ const UploadPage = () => {
       const result = response.data;
 
       setTransactionHash(result.tx_hash);
+      setHexString(hexString);
       setTimestamp(result.timestamp);
       setEtherscanLink(result.etherscan_url);
       setIpfsHash(result.ipfs_hash);
@@ -141,6 +147,15 @@ const UploadPage = () => {
               <i
                 className="fas fa-copy text-primary"
                 onClick={() => copyToClipboard(transactionHash)}
+              ></i>
+            </p>
+          )}
+          {transactionHash && (
+            <p>
+              <strong>Encryption Key:</strong> {hexString}{" "}
+              <i
+                className="fas fa-copy text-primary"
+                onClick={() => copyToClipboard(hexString)}
               ></i>
             </p>
           )}

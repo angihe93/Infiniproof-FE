@@ -5,6 +5,7 @@ import API_BASE_URL from "../config";
 
 const VerificationPage = () => {
   const [transactionHash, setTransactionHash] = useState("");
+  const [fileName, setFileName] = useState("");
   const [fileHash, setFileHash] = useState("");
   const [timestamp, setTimestamp] = useState("");
   const [ipfsGatewayLink, setIpfsGatewayLink] = useState("");
@@ -34,6 +35,7 @@ const VerificationPage = () => {
       // setTimestamp(new Date(result.timestamp * 1000).toLocaleString());
       setTimestamp(result.timestamp) //timestamp is already string
       setIpfsGatewayLink(result.bc_file_link);
+      setFileName(result.file_name);
       setTransactionLink("https://sepolia.etherscan.io/tx/0x"+transactionHash)
     } catch (error) {
       setErrorMessage(`Error: ${error.message}`);
@@ -73,6 +75,7 @@ const VerificationPage = () => {
               ></i>
             </p>
           )}
+          {timestamp && <p><strong>File Name:</strong> {fileName}</p>}
           {timestamp && <p><strong>Timestamp:</strong> {timestamp}</p>}
           {ipfsGatewayLink && (
             <p>

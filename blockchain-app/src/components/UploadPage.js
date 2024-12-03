@@ -66,6 +66,7 @@ const UploadPage = () => {
     try {
       const key = await generateKey();
       const { nonce, encryptedFile } = await encryptFile(file, key);
+      const file_name = file.name;
 
       const encryptedData = new Uint8Array([...nonce, ...encryptedFile]);
       const fileHash = await createHash(encryptedData);
@@ -83,6 +84,7 @@ const UploadPage = () => {
 
       const response = await axios.post(`${API_BASE_URL}/upload`, formData, {
         params: {
+          file_name,
           email,
           password,
           decrypt_key_first_last_5: decryptKeyFirstLast,

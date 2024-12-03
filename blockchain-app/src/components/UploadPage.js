@@ -61,7 +61,7 @@ const UploadPage = () => {
 
     setUploadLoader(true);
     setErrorMessage("");
-    setStatusMessage("Encrypting and uploading...");
+    setStatusMessage("Encrypting and uploading hash to Etherium, file to IPFS...");
 
     try {
       const key = await generateKey();

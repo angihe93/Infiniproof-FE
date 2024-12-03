@@ -30,7 +30,8 @@ const VerificationPage = () => {
 
       // Update the state with retrieved data
       setFileHash(result.file_hash);
-      setTimestamp(new Date(result.timestamp * 1000).toLocaleString());
+      // setTimestamp(new Date(result.timestamp * 1000).toLocaleString());
+      setTimestamp(result.timestamp) //timestamp is already string
       setIpfsGatewayLink(result.ipfs_url);
     } catch (error) {
       setErrorMessage(`Error: ${error.message}`);
@@ -45,6 +46,7 @@ const VerificationPage = () => {
     <div className="container py-4">
       <div className="card p-4">
         <h2 className="text-center">Retrieve Data by Transaction Hash</h2>
+        <p className="text-center"><em>Please wait 15 minutes after upload for IPFS processing before verifying.</em></p>
         <input
           type="text"
           className="form-control"

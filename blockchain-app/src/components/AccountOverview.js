@@ -38,7 +38,7 @@ const AccountOverview = () => {
       <table className="table table-striped table-hover shadow-lg mt-4">
         <thead className="table-dark">
           <tr>
-            <th>Hash Value</th>
+            <th>Encrypted File Hash Value</th>
             <th>Blockchain Link</th>
             <th>File Link</th>
             <th>Key (First 5...Last 5)</th>

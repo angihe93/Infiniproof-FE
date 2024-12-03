@@ -32,7 +32,7 @@ const VerificationPage = () => {
       setFileHash(result.file_hash);
       // setTimestamp(new Date(result.timestamp * 1000).toLocaleString());
       setTimestamp(result.timestamp) //timestamp is already string
-      setIpfsGatewayLink(result.ipfs_url);
+      setIpfsGatewayLink(result.bc_file_link);
     } catch (error) {
       setErrorMessage(`Error: ${error.message}`);
     }
@@ -59,6 +59,9 @@ const VerificationPage = () => {
         </button>
         {errorMessage && <p className="text-danger mt-3">{errorMessage}</p>}
         <div className="mt-4">
+        {fileHash && <p><em>Successfully retrieved encrypted file from IPFS</em></p>}
+        {fileHash && <p><em>Hash of file from IPFS matches hash stored at {transactionHash}</em></p>}
+        {fileHash && <p><strong color="green"><font color="green">Verification successful!</font></strong></p>}
           {fileHash && (
             <p>
               <strong>File Hash:</strong> {fileHash}{" "}

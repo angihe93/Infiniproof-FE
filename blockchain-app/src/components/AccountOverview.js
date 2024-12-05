@@ -51,7 +51,7 @@ const AccountOverview = () => {
             <th>Blockchain Link</th>
             <th>File Link</th>
             <th>Key (First 5...Last 5)</th>
-            <th>Timestamp</th>
+            <th style={{ whiteSpace: "nowrap", minWidth: "200px" }}>Timestamp</th>
           </tr>
         </thead>
         <tbody>
@@ -62,7 +62,7 @@ const AccountOverview = () => {
                 <td>{tx.file_hash}</td> {/* Encrypted file hash */}
                 <td>
                   <a
-                    href={tx.etherscan_url}
+                    href={tx.bc_hash_link}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-sm btn-outline-primary"
@@ -72,7 +72,7 @@ const AccountOverview = () => {
                 </td>
                 <td>
                   <a
-                    href={tx.ipfs_link}
+                    href={tx.bc_file_link}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-sm btn-outline-success"

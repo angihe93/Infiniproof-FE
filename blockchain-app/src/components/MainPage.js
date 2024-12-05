@@ -48,9 +48,8 @@ const MainPage = ({ isLoggedIn }) => {
           className="container h-100 d-flex flex-column justify-content-center align-items-center"
           style={{ zIndex: 2, position: "relative" }}
         >
-          <h1 className="display-3 fw-bold">Welcome to Our Platform</h1>
+          <h1 className="display-3 fw-bold">INFINIPROOF</h1>
           <p className="lead mt-3">
-            Experience the most secure and reliable blockchain solutions.
           </p>
           <div className="mt-4">
             {/* Upload Button */}

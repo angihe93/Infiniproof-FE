@@ -71,7 +71,6 @@ const VerificationPage = () => {
         setErrorMessage(`Unexpected error: ${error.message}`);
       }
     }
-    
   };
 
   const copyToClipboard = (text) => {

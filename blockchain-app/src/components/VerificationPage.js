@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import Dropzone from "react-dropzone";
+import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import API_BASE_URL from "../config";
@@ -11,17 +13,31 @@ const VerificationPage = () => {
   const [ipfsGatewayLink, setIpfsGatewayLink] = useState("");
   const [transactionLink, setTransactionLink] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [file, setFile] = useState(null);
+  const [uploadLoader, setUploadLoader] = useState(false);
 
   const handleRetrieve = async () => {
     if (!transactionHash) {
       setErrorMessage("Please enter a transaction hash");
       return;
     }
+    if (!file) {
+      setErrorMessage("Please select a file");
+      return;
+    }
+    setUploadLoader(true);
 
     setErrorMessage("");
     try {
+      //get file contents
+      const fileContent = new Uint8Array(await file.arrayBuffer());
+
       // Fetch data from the API endpoint
-      const response = await fetch(`${API_BASE_URL}/verify/${transactionHash}`);
+      // upload file encrypted file provide by user
+      const formData = new FormData();
+      formData.append("tx_hash", transactionHash);
+      formData.append("encrypted_file", new Blob([fileContent]));
+      const response = await axios.post(`${API_BASE_URL}/verify/${transactionHash}`, formData);
 
       if (!response.ok) {
         const errorResult = await response.json();
@@ -58,9 +74,23 @@ const VerificationPage = () => {
           value={transactionHash}
           onChange={(e) => setTransactionHash(e.target.value)}
         />
+        <Dropzone onDrop={(acceptedFiles) => setFile(acceptedFiles[0])}>
+          {({ getRootProps, getInputProps }) => (
+            <div
+              {...getRootProps()}
+              className="dropzone border p-3 text-center"
+              style={{ cursor: "pointer" }}
+            >
+              <input {...getInputProps()} />
+              <p>Drag & drop your file here, or click to select one</p>
+            </div>
+          )}
+        </Dropzone>
+        {file && <p className="mt-3"><strong>Selected File:</strong> {file.name}</p>}
         <button className="btn btn-primary mt-3" onClick={handleRetrieve}>
           Retrieve
         </button>
+        {uploadLoader && <div className="loader mt-3"></div>}
         {errorMessage && <p className="text-danger mt-3">{errorMessage}</p>}
         <div className="mt-4">
         {fileHash && <p><em>Successfully retrieved encrypted file from IPFS</em></p>}

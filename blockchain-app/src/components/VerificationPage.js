@@ -32,29 +32,46 @@ const VerificationPage = () => {
       const formData = new FormData();
       formData.append("tx_hash", transactionHash);
       formData.append("encrypted_file", file);
+    
       const response = await axios.post(`${API_BASE_URL}/verify/${transactionHash}`, formData);
-
-      if (response.status !== 200) {
-        setErrorMessage("Failed to retrieve data!");
-        throw new Error(response.data.detail || "Failed to retrieve data!");
-      } else if (response.status === 404) {
+    
+      // Handle different HTTP status codes
+      if (response.status === 404) {
         setErrorMessage("File hashes do not match!");
-        throw new Error(response.data.detail || "File hashes do not match!");
+        throw new Error(response.data?.detail || "File hashes do not match!");
+      } else if (response.status !== 200) {
+        setErrorMessage("Failed to retrieve data!");
+        throw new Error(response.data?.detail || "Failed to retrieve data!");
       }
-
-      const result = await response.data;
-
-      // Update the state with retrieved data
-      setFileHash(result.file_hash);
-      // setTimestamp(new Date(result.timestamp * 1000).toLocaleString());
-      setTimestamp(result.timestamp) //timestamp is already string
-      setIpfsGatewayLink(result.bc_file_link);
-      setFileName(result.file_name);
-      setTransactionLink("https://sepolia.etherscan.io/tx/0x"+transactionHash)
+    
+      // Assuming response.data contains the result, safely access the response data
+      const result = response.data;
+    
+      // Update the state with the retrieved data
+      setFileHash(result?.file_hash || ""); // Add fallback values in case of missing fields
+      setTimestamp(result?.timestamp || ""); // Ensure you handle missing or null timestamps
+      setIpfsGatewayLink(result?.bc_file_link || "");
+      setFileName(result?.file_name || "");
+      setTransactionLink(`https://sepolia.etherscan.io/tx/0x${transactionHash}`);
     } catch (error) {
-      // setErrorMessage(`Error: ${error.message}`);
-      setErrorMessage(`Error: Hashes do not match!`)
+      if (axios.isAxiosError(error)) {
+        // If the error is from Axios, we have access to response and error details
+        if (error.response) {
+          // Axios response error (e.g., 404, 500, etc.)
+          setErrorMessage(`Error: ${error.response?.data?.detail || "Unexpected error occurred"}`);
+        } else if (error.request) {
+          // The request was made, but no response was received (e.g., network errors)
+          setErrorMessage("Network error, please try again.");
+        } else {
+          // An error occurred during request setup (e.g., invalid URL)
+          setErrorMessage(`Request Error: ${error.message}`);
+        }
+      } else {
+        // For unexpected errors not related to Axios
+        setErrorMessage(`Unexpected error: ${error.message}`);
+      }
     }
+    
   };
 
   const copyToClipboard = (text) => {

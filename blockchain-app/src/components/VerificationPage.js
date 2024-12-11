@@ -29,22 +29,20 @@ const VerificationPage = () => {
 
     setErrorMessage("");
     try {
-      //get file contents
-      const fileContent = new Uint8Array(await file.arrayBuffer());
-
-      // Fetch data from the API endpoint
-      // upload file encrypted file provide by user
       const formData = new FormData();
       formData.append("tx_hash", transactionHash);
-      formData.append("encrypted_file", new Blob([fileContent]));
+      formData.append("encrypted_file", file);
       const response = await axios.post(`${API_BASE_URL}/verify/${transactionHash}`, formData);
 
-      if (!response.ok) {
-        const errorResult = await response.json();
-        throw new Error(errorResult.detail || "Failed to retrieve data");
+      if (response.status !== 200) {
+        setErrorMessage("Failed to retrieve data!");
+        throw new Error(response.data.detail || "Failed to retrieve data!");
+      } else if (response.status === 404) {
+        setErrorMessage("File hashes do not match!");
+        throw new Error(response.data.detail || "File hashes do not match!");
       }
 
-      const result = await response.json();
+      const result = await response.data;
 
       // Update the state with retrieved data
       setFileHash(result.file_hash);
@@ -54,7 +52,8 @@ const VerificationPage = () => {
       setFileName(result.file_name);
       setTransactionLink("https://sepolia.etherscan.io/tx/0x"+transactionHash)
     } catch (error) {
-      setErrorMessage(`Error: ${error.message}`);
+      // setErrorMessage(`Error: ${error.message}`);
+      setErrorMessage(`Error: Hashes do not match!`)
     }
   };
 
@@ -66,7 +65,7 @@ const VerificationPage = () => {
     <div className="container py-4">
       <div className="card p-4">
         <h2 className="text-center">Retrieve Data by Transaction Hash</h2>
-        <p className="text-center"><em>Please wait 15 minutes after upload for IPFS processing before verifying.</em></p>
+        <p className="text-center"><em>Please wait 1 minute after upload for IPFS processing before verifying.</em></p>
         <input
           type="text"
           className="form-control"
@@ -94,7 +93,7 @@ const VerificationPage = () => {
         {errorMessage && <p className="text-danger mt-3">{errorMessage}</p>}
         <div className="mt-4">
         {fileHash && <p><em>Successfully retrieved encrypted file from IPFS</em></p>}
-        {fileHash && <p><em>Hash of file from IPFS matches hash stored at </em><a href={transactionLink} target="_blank" rel="noopener noreferrer">{transactionHash}</a></p>}
+        {fileHash && <p><em>Hash of uploaded file matches hash stored at </em><a href={transactionLink} target="_blank" rel="noopener noreferrer">{transactionHash}</a></p>}
         {fileHash && <p><strong color="green"><font color="green">Verification successful!</font></strong></p>}
           {fileHash && (
             <p>

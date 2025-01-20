@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import API_BASE_URL from "../config";
+import DecryptFile from "./DecryptFile";
 
 const AccountOverview = () => {
   const [transactions, setTransactions] = useState([]);
   const [message, setMessage] = useState("");
+  const [sortCriteria, setSortCriteria] = useState(""); /* sort by filename or timestamp */
+  const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -38,11 +41,62 @@ const AccountOverview = () => {
     fetchTransactions();
   }, []);
 
+  const sortTransactions = (transactions, criteria, order) => {
+    console.log("in sortTransactions");
+    // if (criteria === "") return transactions;
+    if (criteria === "filename") {
+      transactions.sort((a,b) => {
+        if (order === "asc") {
+          if (a.file_name < b.file_name)
+            return -1;
+          if (a.file_name > b.file_name)
+            return 1;
+          return 0;
+        }
+        else if (order === "dsc") {
+          if (a.file_name < b.file_name)
+            return 1;
+          if (a.file_name > b.file_name)
+            return -1;
+          return 0;
+        }
+        return 0;
+      })
+    }
+    else if (criteria === "timestamp") {
+      transactions.sort((a,b) => {
+        if (order === "asc") {
+          if (a.timestamp < b.timestamp)
+            return -1;
+          if (a.timestamp > b.timestamp)
+            return 1;
+          return 0;
+        }
+        else if (order === "dsc") {
+          if (a.timestamp < b.timestamp)
+            return 1;
+          if (a.timestamp > b.timestamp)
+            return -1;
+          return 0;
+        }
+        return 0;
+      })
+    }
+    return transactions;
+  };
+
+  const sortedTransactions = sortTransactions(transactions, sortCriteria, sortOrder);
+
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4" style={{ fontWeight: "bold", fontSize: "2.5rem" }}>
         Account Overview
       </h2>
+      <button onClick={() => {setSortCriteria("filename"); console.log("sort by filename");}}>Sort by Filename</button>
+      <button onClick={() => {setSortCriteria("timestamp"); console.log("sort by timestamp");}}>Sort by Timestamp</button>
+      <button onClick={() => {setSortOrder(sortOrder === "asc" ? "desc" : "asc"); console.log(sortOrder);}}>
+          Toggle Sort Order
+        </button>
       <table className="table table-striped table-hover shadow-lg mt-4">
         <thead className="table-dark">
           <tr>
@@ -52,11 +106,14 @@ const AccountOverview = () => {
             <th>File Link</th>
             <th>Key (First 5...Last 5)</th>
             <th style={{ whiteSpace: "nowrap", minWidth: "200px" }}>Timestamp</th>
+            <th>Decrypt File</th>
           </tr>
         </thead>
         <tbody>
           {transactions.length ? (
-            transactions.map((tx, index) => (
+            /* check state of sort, if not sorting, use transactions.map */
+            /* if sort state is set, sort by that */
+            sortedTransactions.map((tx, index) => (
               <tr key={index}>
                 <td>{tx.file_name}</td> {/* Filename */}
                 <td>{tx.file_hash}</td> {/* Encrypted file hash */}
@@ -82,6 +139,9 @@ const AccountOverview = () => {
                 </td>
                 <td>{tx.decrypt_key_first_last_5}</td> {/* Key */}
                 <td>{tx.timestamp}</td> {/* Display raw timestamp */}
+                <td>
+                  <DecryptFile encryptedFileLink={tx.bc_file_link} fileName={tx.file_name}/>
+                </td>
               </tr>
             ))
           ) : (
